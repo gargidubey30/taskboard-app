@@ -154,6 +154,7 @@
 
 
 // pages/api/tasks/[id].js
+// pages/api/tasks/[id].js - Fixed imports
 import jwt from 'jsonwebtoken';
 import { readData } from '@/lib/data';
 
@@ -180,6 +181,28 @@ function parseCookies(cookieString) {
   });
   
   return cookies;
+}
+
+// Manual data write function
+async function writeDataManual(data) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    // Update global memory storage
+    global.appData = {
+      users: data.users || [],
+      boards: data.boards || [],
+      tasks: data.tasks || []
+    };
+    console.log('💾 Updated memory storage');
+  } else {
+    // Write to file in development
+    const fs = await import('fs');
+    const path = await import('path');
+    const dataFilePath = path.join(process.cwd(), 'data.json');
+    await fs.promises.writeFile(dataFilePath, JSON.stringify(data, null, 2), 'utf8');
+    console.log('💾 Updated file storage');
+  }
 }
 
 export default async function handler(req, res) {
@@ -224,8 +247,8 @@ export default async function handler(req, res) {
         data.tasks[taskIndex].status = status;
       }
 
-      const { writeData } = await import('@/lib/data');
-      await writeData(data);
+      // Save changes
+      await writeDataManual(data);
 
       console.log('✅ Task updated successfully');
       return res.status(200).json(data.tasks[taskIndex]);
@@ -234,10 +257,11 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       console.log('🗑️ Deleting task:', task.title);
       
+      // Remove task
       data.tasks.splice(taskIndex, 1);
       
-      const { writeData } = await import('@/lib/data');
-      await writeData(data);
+      // Save changes
+      await writeDataManual(data);
 
       console.log('✅ Task deleted successfully');
       return res.status(200).json({ message: 'Task deleted successfully' });
