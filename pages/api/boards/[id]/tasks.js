@@ -135,7 +135,7 @@
 
 // }
 
-// pages/api/boards/[id]/tasks.js
+// pages/api/boards/[id]/tasks.js - Fixed imports
 import jwt from 'jsonwebtoken';
 import { readData } from '@/lib/data';
 
@@ -162,6 +162,28 @@ function parseCookies(cookieString) {
   });
   
   return cookies;
+}
+
+// Manual data write function
+async function writeDataManual(data) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    // Update global memory storage
+    global.appData = {
+      users: data.users || [],
+      boards: data.boards || [],
+      tasks: data.tasks || []
+    };
+    console.log('💾 Updated memory storage - tasks:', data.tasks.length);
+  } else {
+    // Write to file in development
+    const fs = await import('fs');
+    const path = await import('path');
+    const dataFilePath = path.join(process.cwd(), 'data.json');
+    await fs.promises.writeFile(dataFilePath, JSON.stringify(data, null, 2), 'utf8');
+    console.log('💾 Updated file storage - tasks:', data.tasks.length);
+  }
 }
 
 export default async function handler(req, res) {
@@ -214,10 +236,11 @@ export default async function handler(req, res) {
         createdAt: new Date().toISOString(),
       };
 
-      // Add task to memory
+      // Add task to data
       data.tasks.push(newTask);
-      const { writeData } = await import('@/lib/data');
-      await writeData(data);
+      
+      // Save to memory/file
+      await writeDataManual(data);
 
       console.log('✅ Task created successfully:', newTask.title);
       return res.status(201).json(newTask);
