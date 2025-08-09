@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "id": "1754622516858",
+      "username": "Gargi",
+      "password": "$2b$10$wUFd.7826l18qEq./is7gupXqHXmyqAxm8YbmdBAWBa6en/ipAnnu"
+    },
+    {
+      "id": "1754652271936",
+      "username": "Dubey",
+      "password": "$2b$10$7z2iaUrMq0DF.YPCiYBsCeve63O3kk8m3MaopGEcDS0zyVxrtTPoK"
+    }
+  ],
+  "boards": [
+    {
+      "id": "1754643466644",
+      "userId": "1754622516858",
+      "name": "Gargdubey"
+    },
+    {
+      "id": "1754652193022",
+      "userId": "1754622516858",
+      "name": "Gargi"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1754672979757",
+      "boardId": "1754643466644",
+      "userId": "1754622516858",
+      "title": "swimming",
+      "description": "I like to swim",
+      "status": "Pending",
+      "createdAt": "2025-08-08T17:09:39.758Z"
+    }
+  ]
+}
